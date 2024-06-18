@@ -1,24 +1,61 @@
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+  useLocation,
+} from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import SignUpScreen from "./screens/Auth/SignUpScreen";
+import ChatScreen from "./screens/ChatScreen";
+
+const queryClient = new QueryClient();
+
+function RequireAuth({ children }) {
+  let location = useLocation();
+  const storedData = JSON.parse(localStorage.getItem("user")) || {};
+  if (!storedData.token) {
+    return <Navigate to="/home" state={{ from: location }} replace />;
+  }
+
+  return children;
+}
+
+function RedirectIfLoggedIn({ children }) {
+  const storedData = JSON.parse(localStorage.getItem("user")) || {};
+  if (storedData.token) {
+    return <Navigate to="/" replace />;
+  }
+
+  return children;
+}
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <QueryClientProvider client={queryClient}>
+      <Router>
+        <Routes>
+          <Route
+            path="/signup"
+            element={
+              <RedirectIfLoggedIn>
+                <SignUpScreen />
+              </RedirectIfLoggedIn>
+            }
+          />
+          <Route
+            path="/chat"
+            element={
+              <RedirectIfLoggedIn>
+                <ChatScreen />
+              </RedirectIfLoggedIn>
+            }
+          />
+          <Route path="*" element={<Navigate to="/not-found" />} />
+        </Routes>
+      </Router>
+    </QueryClientProvider>
   );
 }
 
