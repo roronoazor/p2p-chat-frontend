@@ -6,20 +6,20 @@ import {
   Box,
   Typography,
   Link,
-  Alert,
   Snackbar,
+  Alert,
 } from "@mui/material";
-import { LoadingButton } from "@mui/lab";
 import logoImg from "../../assets/logo.png";
 import axios from "axios";
-import { SIGNUP_URL } from "../../config/serverUrls";
-import { ALERT_TYPES } from "../../config/alerts";
+import { LOGIN_URL } from "../../config/serverUrls";
 import { extractErrorMessage } from "../../modules/helpers";
+import { ALERT_TYPES } from "../../config/alerts";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { loginUser } from "../../redux/auth/authSlice";
+import { LoadingButton } from "@mui/lab";
 
-const SignUpScreen = () => {
+const LoginScreen = () => {
   const [isLoading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [severity, setSeverity] = useState("");
@@ -27,7 +27,6 @@ const SignUpScreen = () => {
   const dispatch = useDispatch();
   const [formData, setFormData] = useState({
     email: "",
-    name: "",
     phoneNumber: "",
   });
   const navigate = useNavigate();
@@ -45,7 +44,7 @@ const SignUpScreen = () => {
   };
 
   const onFormSubmit = (event) => {
-    if (!formData?.email || !formData?.name || !formData?.phoneNumber) {
+    if (!formData?.email || !formData?.phoneNumber) {
       setMessage("Please fill all relevant fields");
       setSeverity("error");
       setOpen(true);
@@ -54,12 +53,12 @@ const SignUpScreen = () => {
 
     setLoading(true);
     axios
-      .post(SIGNUP_URL, formData)
+      .post(LOGIN_URL, formData)
       .then((response) => {
         if (response.status === 201) {
           setLoading(false);
           setSeverity(ALERT_TYPES.SUCCESS);
-          setMessage("Signup Successful");
+          setMessage("Login Successful");
           setOpen(true);
 
           let userData = response.data;
@@ -103,16 +102,6 @@ const SignUpScreen = () => {
         backgroundColor: "#8BABD8",
       }}
     >
-      <Snackbar
-        anchorOrigin={{ vertical: "top", horizontal: "right" }}
-        open={open}
-        autoHideDuration={6000}
-        onClose={handleClose}
-      >
-        <Alert onClose={handleClose} severity={severity}>
-          {message}
-        </Alert>
-      </Snackbar>
       <Box
         maxWidth="420px"
         sx={{
@@ -123,8 +112,19 @@ const SignUpScreen = () => {
           textAlign: "center",
         }}
       >
+        <Snackbar
+          anchorOrigin={{ vertical: "top", horizontal: "right" }}
+          open={open}
+          autoHideDuration={6000}
+          onClose={handleClose}
+        >
+          <Alert onClose={handleClose} severity={severity}>
+            {message}
+          </Alert>
+        </Snackbar>
         <Box sx={{ marginBottom: 4 }}>
           <img src={logoImg} alt="Chat Logo" />
+          <Typography variant="h5">Login</Typography>
         </Box>
         <Box>
           <TextField
@@ -132,23 +132,10 @@ const SignUpScreen = () => {
             margin="normal"
             required
             fullWidth
-            id="name"
-            label="Name"
-            name="name"
-            onChange={handleChange}
-            autoComplete="name"
-            autoFocus
-            sx={{ marginBottom: 1 }}
-          />
-          <TextField
-            variant="outlined"
-            margin="normal"
-            required
-            fullWidth
             id="email"
             label="Email"
-            name="email"
             onChange={handleChange}
+            name="email"
             autoComplete="email"
             sx={{ marginBottom: 1 }}
           />
@@ -157,10 +144,10 @@ const SignUpScreen = () => {
             margin="normal"
             required
             fullWidth
-            id="phone"
+            id="phoneNumber"
             label="Phone Number"
-            name="phoneNumber"
             onChange={handleChange}
+            name="phoneNumber"
             autoComplete="phone"
             sx={{ marginBottom: 2 }}
           />
@@ -176,12 +163,12 @@ const SignUpScreen = () => {
             onClick={onFormSubmit}
             loading={isLoading}
           >
-            Sign Up
+            Login
           </LoadingButton>
           <Typography sx={{ marginTop: 2 }}>
-            Have an account?{" "}
-            <Link href="/login" color="primary">
-              Login
+            Don't have an account?{" "}
+            <Link href="/signup" color="primary">
+              Signup
             </Link>
           </Typography>
         </Box>
@@ -190,4 +177,4 @@ const SignUpScreen = () => {
   );
 };
 
-export default SignUpScreen;
+export default LoginScreen;
