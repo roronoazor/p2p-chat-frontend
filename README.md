@@ -1,70 +1,120 @@
-# Getting Started with Create React App
+## README
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# React P2P Chat Application
 
-## Available Scripts
+## Overview
 
-In the project directory, you can run:
+The React P2P Chat Application is a real-time chat service built using React and Socket.IO. This application allows users to register, login, and engage in real-time messaging with other users. It includes features like online/offline user status tracking, search functionality for users, and offline message storage, ensuring messages are delivered when users come online.
 
-### `npm start`
+## Features
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- User Registration and Authentication
+- Real-time messaging with Socket.IO
+- Online/offline user status tracking
+- Offline message storage and delivery
+- Search functionality for users
+- Integration with a NestJS backend
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Design Choices
 
-### `npm test`
+To minimize the number of dependencies required to set up the application for both the frontend and backend, Node.js was chosen for the backend. This allows a user to only need Node.js and npm to get up and running without the hassle of installing Node.js for the frontend and another programming language like Python or Java for the backend. The use of Socket.IO provides real-time communication capabilities. SQLite was chosen as the database on the backend for its simplicity and ease of setup, but it is expected to be swapped out for a production-grade database in a production environment.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Requirements
 
-### `npm run build`
+- Node.js v16 or above
+- React
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Getting Started
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### Installation
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+1. Clone the repository
 
-### `npm run eject`
+   ```bash
+   git clone https://github.com/roronoazor/p2p-chat-frontend.git
+   cd p2p-chat-frontend
+   ```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+2. Install dependencies
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+   ```bash
+   npm install
+   ```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+3. Set up environment variables
+   Create a `.env` file in the root directory and add the following:
+   ```
+   REACT_APP_SOCKET_URL="http://localhost:3000"
+   ```
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+### Running the Application
 
-## Learn More
+#### Using Makefile
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+1. Install dependencies
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+   ```bash
+   make install
+   ```
 
-### Code Splitting
+2. Start the application in development mode
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+   ```bash
+   make start-dev
+   ```
 
-### Analyzing the Bundle Size
+3. Build the application for production
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+   ```bash
+   make build
+   ```
 
-### Making a Progressive Web App
+#### Without Makefile
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+1. Install dependencies
 
-### Advanced Configuration
+   ```bash
+   npm install
+   ```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+2. Start the application in development mode
 
-### Deployment
+   ```bash
+   npm start
+   ```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+3. Build the application for production
 
-### `npm run build` fails to minify
+   ```bash
+   npm run build
+   ```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+## Application Structure
+
+The application is structured into the following main components:
+
+- **LoginScreen/Signup**: Handles user authentication.
+- **ChatScreen**: The main chat interface, containing the Sidebar, ChatWindow, and UserProfile components.
+- **Sidebar**: Displays the list of users and search functionality.
+- **ChatWindow**: Displays the chat messages and input field for sending messages.
+- **UserProfile**: Displays the profile information of the selected user.
+
+## API Endpoints
+
+### Authentication
+
+- **POST /auth/register**: Register a new user
+- **POST /auth/login**: Login a user
+
+### Users
+
+- **GET /users**: Get a list of users
+- **GET /users/:id**: Get a specific user by ID
+
+### WebSocket Events
+
+- **userOnline**: Notify when a user is online
+- **userOffline**: Notify when a user is offline
+- **sendMessage**: Send a message to another user
+- **messageReceived**: Receive a message from another user
+- **searchUsers**: Search for users by email or phone number
