@@ -14,7 +14,11 @@ import {
   setUserDropped,
   appendMessage,
   setOfflineMessages,
+  loadMessagesFromDB,
+  loadBlockedUsersFromDB,
+  setBlockedUsers,
 } from "../../redux/chat/chatSlice";
+import { addBlockedUser, getBlockedUsers } from "../../utils/indexedDb";
 
 const duration = 300;
 
@@ -43,10 +47,17 @@ const ChatScreen = () => {
   };
 
   useEffect(() => {
+    dispatch(loadMessagesFromDB(userData.id));
+    dispatch(loadBlockedUsersFromDB(userData.id));
+
     const socket = io(SOCKET_URL, {
       auth: {
         token,
       },
+      reconnection: true,
+      reconnectionAttempts: 5,
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000,
     });
 
     socket.on("connect", () => {
@@ -71,7 +82,12 @@ const ChatScreen = () => {
     };
 
     const handleMessageReceived = (message) => {
-      dispatch(appendMessage({ myId: userData.id, message }));
+      dispatch(
+        appendMessage({
+          myId: userData.id,
+          message: { ...message, userId: userData.id }, // pass the userData.id because of the indexedDb
+        })
+      );
     };
 
     const handleSearchResults = (users) => {
@@ -87,6 +103,16 @@ const ChatScreen = () => {
       );
     };
 
+    const handleUserBlocked = async (blockedUser) => {
+      await addBlockedUser({
+        userId: blockedUser.userId,
+        blockedUserId: blockedUser.userIdToBlock,
+      });
+
+      const blockedUsers = await getBlockedUsers(blockedUser.userId);
+      dispatch(setBlockedUsers(blockedUsers));
+    };
+
     // register event handlers for socket events
     socket.on("allUsers", handleAllUsers);
     socket.on("userJoined", handleUserJoined);
@@ -94,6 +120,7 @@ const ChatScreen = () => {
     socket.on("messageReceived", handleMessageReceived);
     socket.on("searchResults", handleSearchResults);
     socket.on("offlineMessages", handleOfflineMessages);
+    socket.on("userBlocked", handleUserBlocked);
 
     socket.emit("searchUsers", "");
     socket.emit("userOnline", { userId: userData?.id });

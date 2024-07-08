@@ -1,9 +1,16 @@
 import { createSlice } from "@reduxjs/toolkit";
+import {
+  addMessage,
+  getAllMessages,
+  getBlockedUsers,
+  clearMessages,
+} from "../../utils/indexedDb";
 
 export const chatSlice = createSlice({
   name: "chat",
   initialState: {
     persons: [],
+    blockedUsers: [],
     selectedPerson: {},
     messages: [],
   },
@@ -63,7 +70,6 @@ export const chatSlice = createSlice({
       // Add timestamp to the message and push it to the messages array
       state.messages.push({
         ...message,
-        timestamp: new Date().toISOString(),
       });
 
       // Find the person who sent the message
@@ -78,6 +84,8 @@ export const chatSlice = createSlice({
           state.persons[personIndex].lastMessage = message.message;
         }
       }
+
+      addMessage(action.payload.message); // Persist message to IndexedDB
     },
 
     // Update the unread count for the selected person to 0
@@ -115,7 +123,18 @@ export const chatSlice = createSlice({
             state.persons[personIndex].lastMessage = message.message;
           }
         }
+        addMessage(message); // Persist message to IndexedDB
       });
+    },
+
+    // load Messages
+    loadMessages: (state, action) => {
+      state.messages = action.payload;
+    },
+
+    // set blocked users
+    setBlockedUsers: (state, action) => {
+      state.blockedUsers = action.payload;
     },
   },
 });
@@ -128,6 +147,22 @@ export const {
   appendMessage,
   updateReadCount,
   setOfflineMessages,
+  loadMessages,
+  setBlockedUsers,
 } = chatSlice.actions;
+
+export const loadMessagesFromDB = (userId) => async (dispatch) => {
+  const messages = await getAllMessages(userId);
+  dispatch(loadMessages(messages));
+};
+
+export const clearMessagesFromDB = (userId) => async (dispatch) => {
+  await clearMessages(userId);
+};
+
+export const loadBlockedUsersFromDB = (userId) => async (dispatch) => {
+  const blockedUsers = await getBlockedUsers(userId);
+  dispatch(setBlockedUsers(blockedUsers));
+};
 
 export default chatSlice.reducer;

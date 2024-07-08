@@ -36,6 +36,7 @@ const Sidebar = () => {
   const [selectedIndex, setSelectedIndex] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const persons = useSelector(getPersons);
+  const blockedPersons = useSelector((state) => state.chat.blockedUsers);
   const userData = useSelector(getUserData);
   const dispatch = useDispatch();
 
